@@ -5,6 +5,7 @@ public enum ResponseCode {
     ERROR_NO_TOKEN                   (  1, "调用本接口时没有带上合法的token"),
     ERROR_MISSING_PARAMETER          (  2, "缺少必填参数"),
     ERROR_PARAMETER_TYPE_MISMATCH    (  3, "参数类型错误"),
+    ERROR_PARAMETER_INVALID_VALUE    (  4, "参数取值错误"),
 
     USER_WRONG_ID_OR_PASSWORD        (100, "用户名或密码错误"),
     USER_IN_BLACKLIST                (101, "用户在黑名单中，无法登录"),
