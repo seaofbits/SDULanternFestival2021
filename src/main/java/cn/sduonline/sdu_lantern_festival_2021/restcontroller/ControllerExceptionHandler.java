@@ -1,5 +1,7 @@
 package cn.sduonline.sdu_lantern_festival_2021.restcontroller;
 
+import cn.sduonline.sdu_lantern_festival_2021.entity.Response;
+import cn.sduonline.sdu_lantern_festival_2021.entity.ResponseCode;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,14 +10,19 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @ControllerAdvice
 @ResponseBody
-public class ParameterInvalidExceptionHandler {
+public class ControllerExceptionHandler {
     @ExceptionHandler({MissingServletRequestParameterException.class})
-    String MissingParameter() {
-        return "MissingServletRequestParameterException";
+    Response MissingParameter() {
+        return  Response.fail(ResponseCode.ERROR_MISSING_PARAMETER);
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
-    String ParameterTypeError() {
-        return "MethodArgumentTypeMismatchException";
+    Response ParameterTypeMismatch() {
+        return Response.fail(ResponseCode.ERROR_PARAMETER_TYPE_MISMATCH);
+    }
+
+    @ExceptionHandler({Exception.class})
+    Response Exception(){
+        return Response.fail(ResponseCode.ERROR_UNKNOWN);
     }
 }
