@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
@@ -41,6 +42,8 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         }
         long userID = Long.parseLong(stringRedisTemplate.opsForValue().get("token-" + token));
+        // 每次检查token后都重新刷新其有效时间为2小时
+        stringRedisTemplate.expire("token-" + token, 1000 * 60 * 60 * 2, TimeUnit.MILLISECONDS);
         request.setAttribute("user_id", userID);
         return true;
     }
