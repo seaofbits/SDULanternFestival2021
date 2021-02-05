@@ -13,6 +13,7 @@ public enum ResponseCode {
     ROOM_INVALID_ID                  (200, "无效的房间号"),
     ROOM_INVALID_USER                (201, "用户不在该房间内"),
     ROOM_INVALID_STATE               (202, "房间状态错误"),
+    ROOM_USER_ALREADY_IN             (220, "用户已经在房间内"),
     ROOM_INVALID_CALL_TIME           (230, "接口不在开放时间段内"),
     ROOM_MATCH_FAIL                  (231, "匹配失败"),
     ROOM_INVALID_ANSWER_NUM          (261, "当前不应该回答第num道题"),
