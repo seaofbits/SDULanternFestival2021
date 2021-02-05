@@ -15,9 +15,10 @@
     <description>SDUOnline Back-end Project for 2021 Lantern Festival Activity</description>
 
     <properties>
-        <java.version>1.8</java.version>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
+        <!-- Java版本配置（使用Java11） -->
+        <java.version>11</java.version>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
     </properties>
 
     <dependencies>
