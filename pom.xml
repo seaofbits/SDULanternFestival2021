@@ -62,7 +62,6 @@
             <version>1.2.75</version>
         </dependency>
 
-
         <!-- Redis -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -86,7 +85,62 @@
         </pluginRepository>
     </pluginRepositories>
 
+    <!-- 不同环境下的不同配置文件 -->
+    <profiles>
+        <!-- 本地开发环境 -->
+        <profile>
+            <id>develop</id>
+            <properties>
+                <springboot.active-environment>develop</springboot.active-environment>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <!-- 服务器环境 -->
+        <profile>
+            <id>release</id>
+            <properties>
+                <springboot.active-environment>release</springboot.active-environment>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
+        <!-- 打包时，需要额外打包那些资源 -->
+        <resources>
+            <resource>
+                <!--
+                    directory用于指定存储资源的根目录。
+                    注:其路径是(相对于POM文件的)相对路径。
+                    注:如果只写一个directory的话，那么会默认include其下面的所有资源。
+                -->
+                <directory>src/main/resources</directory>
+                <!--
+                    Whether resources are filtered to replace tokens with parameterised values or not.
+                    是否过滤资源,用pom中的对应值替换文件中的对应占位符
+                    注:在spring-boot-starter-parent的pom文件中，将读取pom.xml文件数据的占位符替换为了@，
+                    使用时通过@key@获取key对应的value即可
+                 -->
+                <filtering>true</filtering>
+                <!--
+                    先把其他所有的排除掉，除了application.yml，
+                    然后再在下面的resource里面，根据不同的maven profile激活情况，引入相应的资源文件进来
+                -->
+                <excludes>
+                    <exclude>application-*.yml</exclude>
+                </excludes>
+            </resource>
+
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>application-${springboot.active-environment}.yml</include>
+                </includes>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
