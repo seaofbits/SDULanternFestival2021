@@ -3,3 +3,6 @@ spring:
   profiles:
     # maven在build的时候会自动替换，手动写死的话容易忘记
     active: @springboot.active-environment@
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
