@@ -13,3 +13,7 @@ spring:
     port: 6379
     password:
     # 连接池（jedis.pool）的配置使用默认配置
+
+# MySQL中有谜语题库有多少道题
+riddle:
+  total-number: 600
