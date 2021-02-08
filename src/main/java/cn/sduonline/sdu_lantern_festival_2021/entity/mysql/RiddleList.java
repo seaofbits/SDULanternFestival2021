@@ -11,6 +11,21 @@ public class RiddleList {
     int riddle6ID;
 
 
+    public void setRiddleIDsByArray(int[] riddles){
+        this.setRiddle1ID(riddles[0]);
+        this.setRiddle2ID(riddles[1]);
+        this.setRiddle3ID(riddles[2]);
+        this.setRiddle4ID(riddles[3]);
+        this.setRiddle5ID(riddles[4]);
+        this.setRiddle6ID(riddles[5]);
+    }
+
+    public int[] getRiddleIDsAsArray() {
+        return new int[]{
+                riddle1ID, riddle2ID, riddle3ID, riddle4ID, riddle5ID, riddle6ID
+        };
+    }
+
     public int getRiddleListID() {
         return riddleListID;
     }

@@ -20,6 +20,7 @@ public class RiddleListService {
 
     /**
      * 生成一套新的房间问答题目，并在MySQL中保存
+     *
      * @param roomID 这套题目属于哪个房间？
      * @return 一套题目
      */
@@ -39,12 +40,7 @@ public class RiddleListService {
 
         RiddleList riddleList = new RiddleList();
         riddleList.setRoomID(roomID);
-        riddleList.setRiddle1ID(riddles[0]);
-        riddleList.setRiddle2ID(riddles[1]);
-        riddleList.setRiddle3ID(riddles[2]);
-        riddleList.setRiddle4ID(riddles[3]);
-        riddleList.setRiddle5ID(riddles[4]);
-        riddleList.setRiddle6ID(riddles[5]);
+        riddleList.setRiddleIDsByArray(riddles);
         riddleListMapper.insertRiddleList(riddleList);
         return riddleList;
     }
