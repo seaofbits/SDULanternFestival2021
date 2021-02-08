@@ -3,12 +3,14 @@
 | 历史版本号      | 日期      | 制定人 | 内容说明 |
 | ------------- | --------- | ----- | ------ |
 | 1.0 | 2021.1.26 | 叶郅祺 | 初始版本 |
-| 1.0.3（非正式版本） | 2021.2.1 | 叶郅祺 | 修改了错误码 |
+| 1.0.4（非正式版本） | 2021.2.1 | 叶郅祺 | 修改了错误码 |
 
 版本1.1修订：  
 + 增加了“用户名密码错误”的错误码为100，原100错误变成101
 + 合并了210、260、270错误码至202，并在错误时返回now_state。
 + 增加了错误码999：“未预料的错误”；错误码4：“参数取值错误”；错误码220："用户已经在房间内"
++ 改变了room_attribute，一次性把所有题目都放在房间的riddle_contents属性里。
++ 房间的riddle_answers属性的名字改成了correct_answers。
 
 ## 1. 接口模块说明、设计总体说明
 
@@ -158,9 +160,9 @@ token是服务器生产的**一串用于身份验证的字符串**，有不同�
 | capacity           | Number | 房间容量，值为1或者2                                         | all              |
 | state              | String | 房间的状态，详细说明见上                                     | all              |
 | ready_users        | Array  | 房间内已经确认的用户的id                                     | full、end        |
+| riddle_contents    | Array  | 房间本轮对局的所有题目，数组元素是String                     | playing          |
 | now_riddle_num     | Number | 现在正在答在第几题                                           | playing          |
-| now_riddle_content | String | 现在正在答的题目内容                                         | playing          |
-| riddle_answers     | Array  | 已经完成的题目的答案，在答题失败的时候调用<br />用来“显示正确答案”，数组内元素的类型是String | playing          |
+| correct_answers    | Array  | 已经完成的题目的答案，用来在答题失败的时候<br />“显示正确答案”，数组内元素的类型是String | playing          |
 
 注：在当前状态下没有意义的属性，可能不存在，也可能存在，存在时请忽略。
 
