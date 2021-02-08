@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Iterator;
 import java.util.Map;
 
 @Controller
@@ -33,6 +34,13 @@ public class RoomGetAttributeController {
             return Response.fail(ResponseCode.ROOM_INVALID_USER);
         }
 
+        // 去掉所有private_开头的字段
+        Iterator<String> iterator = attr.keySet().iterator();
+        while(iterator.hasNext()){
+            String str = iterator.next();
+            if (str.startsWith("private_"))
+                iterator.remove();
+        }
         return Response.success(attr);
     }
 }
