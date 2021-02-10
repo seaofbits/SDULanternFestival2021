@@ -24,11 +24,12 @@ public class RoomGetAttributeController {
     @PostMapping(path = "/room/get_attribute")
     public Response getAttr(@RequestParam("room_id") int roomID,
                             @RequestAttribute("user_id") long userID) {
-        Map attr = redisUtil.hmget("room-" + roomID);
         // 异常情况
-        if (attr == null) {
+        if (!redisUtil.hasKey("room-" + roomID)) {
             return Response.fail(ResponseCode.ROOM_INVALID_ID);
         }
+
+        Map attr = redisUtil.hmget("room-" + roomID);
         if (!attr.get("user1_id").equals(userID)
                 && !attr.get("user2_id").equals(userID)) {
             return Response.fail(ResponseCode.ROOM_INVALID_USER);
@@ -36,7 +37,7 @@ public class RoomGetAttributeController {
 
         // 去掉所有private_开头的字段
         Iterator<String> iterator = attr.keySet().iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             String str = iterator.next();
             if (str.startsWith("private_"))
                 iterator.remove();

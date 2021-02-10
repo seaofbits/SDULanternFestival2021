@@ -23,11 +23,12 @@ public class RoomJoinController {
     @PostMapping(path = "/room/join")
     public Response join(@RequestParam("room_id") int roomID,
                          @RequestAttribute("user_id") long userID) {
-        Map attr = redisUtil.hmget("room-" + roomID);
         // 异常情况
-        if (attr == null) {
+        if (!redisUtil.hasKey("room-" + roomID)) {
             return Response.fail(ResponseCode.ROOM_INVALID_ID);
         }
+
+        Map attr = redisUtil.hmget("room-" + roomID);
         if (!attr.get("state").equals("unfull")) {
             return Response.fail(ResponseCode.ROOM_INVALID_STATE,
                     Map.of("now_state", attr.get("state")));
@@ -35,6 +36,7 @@ public class RoomJoinController {
         if (attr.get("user1_id").equals(userID)) {
             return Response.fail(ResponseCode.ROOM_USER_ALREADY_IN);
         }
+
         // 把用户id加入该房间
         attr.put("user2_id", userID);
         // 因为join，房间状态变成了full

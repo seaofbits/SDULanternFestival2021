@@ -28,11 +28,12 @@ public class RoomReadyController {
     @PostMapping(path = "/room/ready")
     public Response ready(@RequestParam("room_id") int roomID,
                           @RequestAttribute("user_id") long userID) {
-        Map attr = redisUtil.hmget("room-" + roomID);
         // 异常情况
-        if (attr == null) {
+        if (!redisUtil.hasKey("room-" + roomID)) {
             return Response.fail(ResponseCode.ROOM_INVALID_ID);
         }
+
+        Map attr = redisUtil.hmget("room-" + roomID);
         if (!attr.get("state").equals("full")
                 && !attr.get("state").equals("end")) {
             return Response.fail(ResponseCode.ROOM_INVALID_STATE,
