@@ -28,7 +28,7 @@ public class RoomCreateController {
             return Response.fail(ResponseCode.ERROR_PARAMETER_INVALID_VALUE);
 
         // 创建一个房间（房间id自增）
-        long roomID = redisUtil.incr("room_id_incr", 1);
+        int roomID = (int) redisUtil.incr("room_id_incr", 1);
 
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("room_id", roomID);
