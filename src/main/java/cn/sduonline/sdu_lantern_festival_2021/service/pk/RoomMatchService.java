@@ -81,6 +81,16 @@ public class RoomMatchService {
             // 遍历数组，每相邻的2个人匹配成同一个房间（所以要i+1也不越界才可以）
             for (int i = 0; (i + 1) < arrLength; i += 2) {
                 int roomID = (int) redisUtil.incr("room_id_incr", 1);
+
+                // 为两个玩家创建一个房间
+                Map<String, Object> attributes = new HashMap<>();
+                attributes.put("room_id", roomID);
+                attributes.put("capacity", 2);
+                attributes.put("user1_id", matchArray[i].userID);
+                attributes.put("user2_id", matchArray[i + 1].userID);
+                attributes.put("state", "full");
+                redisUtil.hmset("room-" + roomID, attributes);
+
                 // 匹配结果20秒内可访问有效
                 redisUtil.set("match_result-" + matchArray[i].userID, roomID, 20);
                 redisUtil.set("match_result-" + matchArray[i + 1].userID, roomID, 20);
