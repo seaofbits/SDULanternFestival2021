@@ -42,8 +42,9 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         }
         long userID = Long.parseLong(stringRedisTemplate.opsForValue().get("token-" + token));
-        // 每次检查token后都重新刷新其有效时间为2小时
+        // 每次检查token后都重新刷新其有效时间为2小时（双向映射都刷新）
         stringRedisTemplate.expire("token-" + token, 1000 * 60 * 60 * 2, TimeUnit.MILLISECONDS);
+        stringRedisTemplate.expire("token-" + userID, 1000 * 60 * 60 * 2, TimeUnit.MILLISECONDS);
         request.setAttribute("user_id", userID);
         return true;
     }
