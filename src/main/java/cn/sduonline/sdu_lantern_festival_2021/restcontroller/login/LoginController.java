@@ -22,6 +22,13 @@ public class LoginController {
     @PostMapping(path = "/login")
     public Response login(@RequestParam("user_id") long userID,
                           @RequestParam("password") String password) {
+        // 检查该用户是否已经有token了，有就直接返回
+        String oldToken = loginService.userHasToken(userID);
+        if (oldToken != null)
+            return Response.success(Map.of("token", oldToken));
+
+        // if in 黑名单 return ...
+
         boolean usernameOrPasswordWrong;
         try {
             // 不敢自动包装，扯出些奇奇怪怪的bug，就这样每次new一下吧
@@ -36,9 +43,7 @@ public class LoginController {
             return Response.fail(ResponseCode.USER_WRONG_ID_OR_PASSWORD);
         }
 
-        // if in 黑名单 return ...
-
-        String token = loginService.getToken(userID);
+        String token = loginService.createToken(userID);
         return Response.success(Map.of("token", token));
     }
 }
