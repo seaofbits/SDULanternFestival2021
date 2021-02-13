@@ -23,5 +23,7 @@ match-interface:
   match-interval: 10000
   # match接口从什么时间到什么时间开放
   time-format: yyyy-MM-dd HH:mm:ss
-  open-time: "2021-02-27 18:00:00"
-  close-time: "2021-02-27 21:00:00"
+#  open-time: "2021-02-27 18:00:00"
+#  close-time: "2021-02-27 21:00:00"
+  open-time: "2021-02-13 9:00:00"
+  close-time: "2021-02-19 9:00:00"

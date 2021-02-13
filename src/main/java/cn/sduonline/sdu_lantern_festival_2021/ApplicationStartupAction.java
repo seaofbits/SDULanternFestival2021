@@ -1,7 +1,6 @@
 package cn.sduonline.sdu_lantern_festival_2021;
 
 import cn.sduonline.sdu_lantern_festival_2021.service.riddle.RiddleService;
-import cn.sduonline.sdu_lantern_festival_2021.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
