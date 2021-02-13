@@ -1,4 +1,4 @@
-package cn.sduonline.sdu_lantern_festival_2021.service.pk;
+package cn.sduonline.sdu_lantern_festival_2021.service.room;
 
 import cn.sduonline.sdu_lantern_festival_2021.entity.mysql.Riddle;
 import cn.sduonline.sdu_lantern_festival_2021.entity.mysql.RiddleList;

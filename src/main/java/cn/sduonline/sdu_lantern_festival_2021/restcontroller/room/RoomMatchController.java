@@ -3,7 +3,7 @@ package cn.sduonline.sdu_lantern_festival_2021.restcontroller.room;
 import cn.sduonline.sdu_lantern_festival_2021.entity.Response;
 import cn.sduonline.sdu_lantern_festival_2021.entity.ResponseCode;
 import cn.sduonline.sdu_lantern_festival_2021.restcontroller.login_inspector.Auth;
-import cn.sduonline.sdu_lantern_festival_2021.service.pk.RoomMatchService;
+import cn.sduonline.sdu_lantern_festival_2021.service.room.RoomMatchService;
 import cn.sduonline.sdu_lantern_festival_2021.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
