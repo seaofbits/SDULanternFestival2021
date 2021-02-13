@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * 房间游戏的各种操作
@@ -46,25 +47,75 @@ public class RoomPlayingOptionsService {
         redisUtil.hset("room-" + roomID, "user2_answers", new ArrayList<String>());
 
         // 初始化二人答对题目数量
-        redisUtil.hset("room-" + roomID, "user1_score", 0);
-        redisUtil.hset("room-" + roomID, "user2_score", 0);
+        redisUtil.hset("room-" + roomID, "user1_correct_num", 0);
+        redisUtil.hset("room-" + roomID, "user2_correct_num", 0);
 
-        // 初始化现在正在答第几题
+        // 初始化现在正在答第几题（从1开始）
         redisUtil.hset("room-" + roomID, "now_riddle_num", 1);
 
-        // 初始化正确答案数组
-        redisUtil.hset("room-" + roomID, "riddle_answers", new ArrayList<String>());
+        // 初始化（公布的）正确答案数组
+        redisUtil.hset("room-" + roomID, "correct_answers", new ArrayList<String>());
 
         // 最后才真正把房间的state变成playing
         redisUtil.hset("room-" + roomID, "state", "playing");
     }
 
 
-    public void answer(int roomID, int num, int whichUser, String answer) {
+    /**
+     * 用户回答一个问题
+     *
+     * @param roomID    哪个房间号
+     * @param num       回答第几题
+     * @param whichUser 为1或者2，代表用户1或者用户2
+     * @param answer    答案
+     * @return "correct"或者“not_correct”代表答案正确与否，或者返回导致异常的原因
+     */
+    public synchronized String answer(int roomID, int num, int whichUser, String answer) {
         // 检查是否能answer
-        ArrayList<String> user1Answers = (ArrayList<String>) redisUtil.hget("room-" + roomID, "user1_answers");
-        ArrayList<String> user2Answers = (ArrayList<String>) redisUtil.hget("room-" + roomID, "user2_answers");
+        int nowRiddleNum = (int) redisUtil.hget("room-" + roomID, "now_riddle_num");
+        if (nowRiddleNum != num) {
+            return "error_num";
+        }
 
+        Map attr = redisUtil.hmget("room-" + roomID);
+        // 存好用户答案
+        ArrayList<String> user1Answers = (ArrayList<String>) attr.get("user1_answers");
+        ArrayList<String> user2Answers = (ArrayList<String>) attr.get("user2_answers");
+        if (whichUser == 1) {
+            user1Answers.add(answer);
+            user2Answers.add(null);
+        } else {      // whichUser == 2
+            user2Answers.add(answer);
+            user1Answers.add(null);
+        }
+        attr.put("user1_answers", user1Answers);
+        attr.put("user2_answers", user2Answers);
+
+
+        // 公布本题正确答案
+        ArrayList<String> riddleAnswers = (ArrayList<String>) attr.get("correct_answers");
+        ArrayList<String> allAnswers = (ArrayList<String>) attr.get("private_all_correct_answers");
+        riddleAnswers.add(allAnswers.get(nowRiddleNum - 1));
+
+        // 检查用户的答案是否正确，以备返回
+        boolean isCorrect = answer.equals(riddleAnswers.get(nowRiddleNum - 1));
+        if (isCorrect) {
+            // 更新正确答案对的题目的数目
+            int correctNum = (int) attr.get("user" + whichUser + "_correct_num");
+            correctNum++;
+            attr.put("user" + whichUser + "_correct_num", correctNum);
+        }
+
+        // 更新房间now_riddle_num和房间状态
+        nowRiddleNum++;
+        attr.put("now_riddle_num", nowRiddleNum);
+        if (nowRiddleNum == 7) {
+            attr.put("state", "end");
+        }
+
+        // 把更新的房间状态应用到redis上，然后返回
+        redisUtil.hmset("room-" + roomID, attr);
+        return isCorrect ? "correct" : "not_correct";
     }
 
 
@@ -77,17 +128,17 @@ public class RoomPlayingOptionsService {
         // 公开：题面
         ArrayList<String> riddleContents = new ArrayList<>();
         // 私有：所有信息
-        ArrayList<Riddle> privateRiddles = new ArrayList<>();
+        ArrayList<String> correctAnswers = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             Riddle riddle = riddleService.getRiddleByID(riddleIDs[i]);
             // 抹去答案信息，存在公开题面那里
             riddleContents.add(riddle.getContent() + "（" + riddle.getTip() + "）");
-            privateRiddles.add(riddle);
+            correctAnswers.add(riddle.getAns());
         }
         // 公开题目套题id，题目内容数组
         redisUtil.hset("room-" + roomID, "riddle_list_id", riddleList.getRiddleListID());
         redisUtil.hset("room-" + roomID, "riddle_contents", riddleContents);
-        // 把含答案的题目信息保存为private字段
-        redisUtil.hset("room-" + roomID, "private_riddles", privateRiddles);
+        // 把正确答案题目信息保存为private字段
+        redisUtil.hset("room-" + roomID, "private_all_correct_answers", correctAnswers);
     }
 }
