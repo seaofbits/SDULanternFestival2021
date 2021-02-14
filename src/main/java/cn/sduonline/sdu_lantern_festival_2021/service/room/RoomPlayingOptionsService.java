@@ -1,5 +1,8 @@
 package cn.sduonline.sdu_lantern_festival_2021.service.room;
 
+import cn.sduonline.sdu_lantern_festival_2021.dao.AnswerSheetMapper;
+import cn.sduonline.sdu_lantern_festival_2021.dao.RankingMapper;
+import cn.sduonline.sdu_lantern_festival_2021.entity.mysql.AnswerSheet;
 import cn.sduonline.sdu_lantern_festival_2021.entity.mysql.Riddle;
 import cn.sduonline.sdu_lantern_festival_2021.entity.mysql.RiddleList;
 import cn.sduonline.sdu_lantern_festival_2021.service.riddle.RiddleListService;
@@ -106,10 +109,12 @@ public class RoomPlayingOptionsService {
             attr.put("user" + whichUser + "_correct_num", correctNum);
         }
 
-        // 更新房间now_riddle_num和房间状态
+        // 更新房间now_riddle_num
         nowRiddleNum++;
         attr.put("now_riddle_num", nowRiddleNum);
+        // 答题结束，提交答卷，计分
         if (nowRiddleNum == 7) {
+            postAnswerSheet(roomID);
             attr.put("state", "end");
         }
 
@@ -140,5 +145,77 @@ public class RoomPlayingOptionsService {
         redisUtil.hset("room-" + roomID, "riddle_contents", riddleContents);
         // 把正确答案题目信息保存为private字段
         redisUtil.hset("room-" + roomID, "private_all_correct_answers", correctAnswers);
+    }
+
+    @Autowired
+    AnswerSheetMapper answerSheetMapper;
+
+    @Autowired
+    RankingMapper rankingMapper;
+
+    /**
+     * 保存某次答题的答卷
+     *
+     * @param roomID 哪个房间
+     */
+    void postAnswerSheet(int roomID) {
+        Map attr = redisUtil.hmget("room-" + roomID);
+        ArrayList<String> user1AnswersArrayList = (ArrayList<String>) attr.get("user1_answers");
+        ArrayList<String> user2AnswersArrayList = (ArrayList<String>) attr.get("user2_answers");
+        String[] user1Answers = user1AnswersArrayList.toArray(new String[0]);
+        String[] user2Answers = user2AnswersArrayList.toArray(new String[0]);
+
+        // 用户1的答卷
+        AnswerSheet user1AnswerSheet = new AnswerSheet();
+        user1AnswerSheet.setRiddleListID((int) attr.get("riddle_list_id"));
+        int user1ID = (int) attr.get("user1_id");
+        user1AnswerSheet.setUserID(user1ID);
+        user1AnswerSheet.setAnswersByArray(user1Answers);
+        user1AnswerSheet.setAnsweredNum((int) attr.get("now_riddle_num") - 1);
+        int user1CorrectNum = (int) attr.get("user1_correct_num");
+        user1AnswerSheet.setCorrectNum(user1CorrectNum);
+
+        int capacity = (int) attr.get("capacity");
+        if (capacity == 1) {
+            int user1Multiply;
+            // 单人问卷：当错误答案数量<=2的时候为2倍，否则为1倍。
+            if (user1CorrectNum >= 4) {
+                user1Multiply = 2;
+            } else {
+                user1Multiply = 1;
+            }
+            user1AnswerSheet.setMultiple(user1Multiply);
+            user1AnswerSheet.setScore(user1CorrectNum * user1Multiply);
+
+            // 保存答卷
+            answerSheetMapper.insert(user1AnswerSheet);
+        } else {
+            // capacity == 2
+            AnswerSheet user2AnswerSheet = new AnswerSheet();
+            user2AnswerSheet.setRiddleListID((int) attr.get("riddle_list_id"));
+            user2AnswerSheet.setUserID((int) attr.get("user2_id"));
+            user2AnswerSheet.setAnswersByArray(user2Answers);
+            user2AnswerSheet.setAnsweredNum((int) attr.get("now_riddle_num") - 1);
+            int user2CorrectNum = (int) attr.get("user2_correct_num");
+            user2AnswerSheet.setCorrectNum(user2CorrectNum);
+
+            // 计算倍数：多人房间，胜者2倍，败者1倍。平局各1倍。
+            int user1Multiply = 1;
+            int user2Multiply = 1;
+            if (user1CorrectNum > user2CorrectNum) {
+                user1Multiply = 2;
+            } else if (user1CorrectNum < user2CorrectNum) {
+                user2Multiply = 2;
+            }
+
+            user1AnswerSheet.setMultiple(user1Multiply);
+            user2AnswerSheet.setMultiple(user2Multiply);
+            user1AnswerSheet.setScore(user1CorrectNum * user1Multiply);
+            user2AnswerSheet.setScore(user2CorrectNum * user2Multiply);
+
+            // 保存答卷
+            answerSheetMapper.insert(user1AnswerSheet);
+            answerSheetMapper.insert(user2AnswerSheet);
+        }
     }
 }
