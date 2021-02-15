@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,17 +23,17 @@ public class RankingService {
      */
     @Scheduled(fixedRate = 60 * 1000)
     public void refreshRankingCache() {
-        redisUtil.lSet("ranking_cache", rankingMapper.getRankingList());
+        redisUtil.set("ranking_cache", rankingMapper.getRankingList());
     }
 
     /**
-     * 返回用户的（缓存的）排名
+     * 返回用户的（可能是缓存的）排名
      *
      * @param userID 用户id
      * @return 用户的排名
      */
     public Ranking getCachedRankingByID(long userID) {
-        List<Ranking> rankingList = (List<Ranking>) (Object) redisUtil.lGet("ranking_cache", 0, -1);
+        List<Ranking> rankingList = (List<Ranking>) (Object) redisUtil.get("ranking_cache");
         for (Ranking ranking : rankingList) {
             if (ranking.getUserID() == userID) {
                 return ranking;
@@ -42,14 +43,26 @@ public class RankingService {
     }
 
     /**
-     * 返回用户的（缓存的）排名
+     * 返回用户的（可能是缓存的）排名
      *
-     * @param userID 用户id
      * @param offset 排名偏移
      * @param limit  排名链接
      * @return 用户的排名
      */
-    public List<Ranking> getCachedRankingList(long userID, int offset, int limit) {
-        return (List<Ranking>) (Object) redisUtil.getRedisTemplate().opsForList().range("ranking_cache", offset, offset + limit);
+    public List<Ranking> getCachedRankingList(int offset, int limit) {
+        if (!redisUtil.hasKey("ranking_cache")) {
+            refreshRankingCache();
+        }
+        List<Ranking> rankingList = (List<Ranking>) (Object) redisUtil.get("ranking_cache");
+        if (offset < 0 || offset >= rankingList.size() || limit < 0) {
+            // 参数有误，返回一个空列表
+            return new ArrayList<>();
+        } else if (offset + limit >= rankingList.size()) {
+            // 返回全表
+            return rankingList;
+        } else {
+            // 返回指定范围的排名列表
+            return rankingList.subList(offset, offset + limit);
+        }
     }
 }

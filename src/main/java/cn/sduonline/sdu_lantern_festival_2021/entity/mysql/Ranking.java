@@ -2,7 +2,7 @@ package cn.sduonline.sdu_lantern_festival_2021.entity.mysql;
 
 public class Ranking {
     private long userID;
-    private int totalPoints;
+    private int totalScore;
     private int totalCorrectNum;
     private int totalAnswerNum;
 
@@ -18,12 +18,12 @@ public class Ranking {
         this.userID = userID;
     }
 
-    public int getTotalPoints() {
-        return totalPoints;
+    public int getTotalScore() {
+        return totalScore;
     }
 
-    public void setTotalPoints(int totalPoints) {
-        this.totalPoints = totalPoints;
+    public void setTotalScore(int totalScore) {
+        this.totalScore = totalScore;
     }
 
     public int getTotalCorrectNum() {

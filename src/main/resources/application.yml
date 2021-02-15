@@ -3,8 +3,10 @@ spring:
   profiles:
     # maven在build的时候会自动替换，手动写死的话容易忘记
     active: @springboot.active-environment@
-  # 日期序列化配置
   jackson:
+    # 序列化时，驼峰命名转为下划线命名
+    property-naming-strategy: SNAKE_CASE
+    # 日期序列化配置
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
 # 开启mybatis驼峰下划线自动转换
@@ -23,7 +25,7 @@ match-interface:
   match-interval: 10000
   # match接口从什么时间到什么时间开放
   time-format: yyyy-MM-dd HH:mm:ss
-#  open-time: "2021-02-27 18:00:00"
-#  close-time: "2021-02-27 21:00:00"
+  #  open-time: "2021-02-27 18:00:00"
+  #  close-time: "2021-02-27 21:00:00"
   open-time: "2021-02-13 9:00:00"
   close-time: "2021-02-19 9:00:00"
