@@ -34,7 +34,7 @@ public class RoomCreateController {
         attributes.put("room_id", roomID);
         attributes.put("capacity", capacity);
         attributes.put("user1_id", userID);
-        attributes.put("user2_id", -1);
+        attributes.put("user2_id", -1L);
         if (capacity == 1) {
             attributes.put("state", "full");
         } else {
