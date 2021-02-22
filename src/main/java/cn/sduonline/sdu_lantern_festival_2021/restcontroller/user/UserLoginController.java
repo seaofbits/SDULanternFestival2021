@@ -1,4 +1,4 @@
-package cn.sduonline.sdu_lantern_festival_2021.restcontroller.login;
+package cn.sduonline.sdu_lantern_festival_2021.restcontroller.user;
 
 import cn.sduonline.sdu_lantern_festival_2021.entity.Response;
 import cn.sduonline.sdu_lantern_festival_2021.entity.ResponseCode;
@@ -15,11 +15,11 @@ import java.util.Map;
 
 @Controller
 @ResponseBody
-public class LoginController {
+public class UserLoginController {
     @Autowired
     LoginService loginService;
 
-    @PostMapping(path = "/login")
+    @PostMapping(path = "/user/login")
     public Response login(@RequestParam("user_id") long userID,
                           @RequestParam("password") String password) {
         // 检查该用户是否已经有token了，有就直接返回
