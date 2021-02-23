@@ -62,6 +62,26 @@
 
      如果执行无误的话，最后一句已经在容器内执行`java -jar`来执行项目的.jar文件了，所以此时后端项目已经开始运行。
 
+4. 为服务器配置HTTPS：
+
+   + 去zerossl，输入域名，登录，验证，得到一个zip文件，里面有`ca_bundle.crt`、`certificate.crt`、`private.key`三个文件。
+   
+   + 然后上传这几个文件到服务器，输入
+     ``` shell
+     openssl pkcs12 -export -clcerts -in ca_bundle.crt -in certificate.crt -inkey private.key -out server.p12
+     ```
+     
+     并记住输入的密码。
+     
+   + 配置`application-release.yml`，在server.ssl下正确配置证书密码、路径。
+   
+   + 修改项目的Dockerfile，增加一行：
+   
+     ``` Dockerfile
+     COPY server.p12 /ssl_key/server.p12
+     ```
+     
+     其中`/ssl_key/server.p12`和yml文件中配置的路径一致。
 
 ## 接口文档
 
