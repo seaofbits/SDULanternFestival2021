@@ -84,7 +84,13 @@ public class RoomDaemonService {
             room.setRoomID((int) attr.get("room_id"));
             room.setRoomCapacity((int) attr.get("capacity"));
             room.setUser1ID((long) attr.get("user1_id"));
-            room.setUser2ID((long) attr.get("user2_id"));
+            Object user2IDObj = attr.get("user2_id");
+            if(user2IDObj instanceof Integer){
+                // 一般只有一种可能：user2ID == -1
+                room.setUser2ID((int) user2IDObj);
+            }else {
+                room.setUser2ID((long)user2IDObj);
+            }
             if (!attr.containsKey("end_reason")) {
                 room.setRoomEndState("terminated");
                 room.setRoomEndReason("正常结束");
