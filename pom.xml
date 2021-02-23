@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.sduonline</groupId>
     <artifactId>sdu_lantern_festival_2021</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>sdu_lantern_festival_2021</name>
     <description>SDUOnline Back-end Project for 2021 Lantern Festival Activity</description>
 
