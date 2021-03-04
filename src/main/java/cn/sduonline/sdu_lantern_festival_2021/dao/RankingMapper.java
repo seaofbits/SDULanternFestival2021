@@ -14,6 +14,6 @@ public interface RankingMapper {
     List<Ranking> getRankingList();
 
     @Select("SELECT user_id, SUM(score) AS total_score, SUM(correct_num) AS total_correct_num, SUM(answered_num) AS total_answer_num " +
-            "FROM answer_sheet GROUP BY user_id HAVING user_id = #{user_id}")
+            "FROM answer_sheet GROUP BY user_id HAVING user_id = #{userID}")
     Ranking getRankingByID(@Param("userID") long userID);
 }
